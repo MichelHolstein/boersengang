@@ -50,6 +50,24 @@ for (const p of report.picks || []) {
     if (!/^https:\/\//.test(src.url || "")) errors.push(`${p.ticker}: Quelle ohne https-URL (${src.name}).`);
   }
 }
+const pf = report.portfolio;
+if (pf !== undefined) {
+  if (!Array.isArray(pf.positions) || pf.positions.length === 0) errors.push("portfolio.positions fehlt oder ist leer.");
+  const ids = new Set();
+  for (const p of (pf && pf.positions) || []) {
+    const n = p.id || "?";
+    if (!/^[a-z0-9-]{1,30}$/.test(p.id || "")) errors.push(`Depot ${n}: id nur aus Kleinbuchstaben, Ziffern und Bindestrich.`);
+    if (ids.has(p.id)) errors.push(`Depot ${n}: id doppelt.`);
+    ids.add(p.id);
+    if (!(typeof p.buyPrice === "number" && p.buyPrice > 0)) errors.push(`Depot ${n}: buyPrice muss eine Zahl größer 0 sein.`);
+    if (p.price !== null && p.price !== undefined && !(typeof p.price === "number" && p.price > 0)) errors.push(`Depot ${n}: price muss eine Zahl größer 0 oder null sein.`);
+    if (!["rueckenwind", "neutral", "gegenwind"].includes(p.stance)) errors.push(`Depot ${n}: stance muss rueckenwind, neutral oder gegenwind sein.`);
+    if (p.tvSymbol !== undefined && !/^[A-Z_]{2,12}:[A-Z0-9._]{1,15}$/.test(p.tvSymbol)) errors.push(`Depot ${n}: tvSymbol muss wie XETR:EUNL aussehen.`);
+    for (const src of [...(p.sources || []), ...(p.priceSource ? [p.priceSource] : [])]) {
+      if (!/^https:\/\//.test(src.url || "")) errors.push(`Depot ${n}: Quelle ohne https-URL (${src.name}).`);
+    }
+  }
+}
 if (/\s[–—]\s/.test(text)) warnings.push("Text enthält Gedankenstriche (– oder —).");
 if (/\bANT\b/.test(JSON.stringify((report.picks || []).map((p) => p.ticker)))) errors.push("Anthropic (ANT) darf nicht bewertet werden.");
 for (const w of warnings) console.warn("Warnung: " + w);

@@ -57,6 +57,39 @@
       "sources": [{ "name": "Quelle", "title": "Titel des Artikels", "url": "https://..." }]
     }
   ],
+  "portfolio": {
+    "asOf": "TT.MM.JJJJ",
+    "summary": "Zwei bis drei Sätze zur Lage des Depots insgesamt.",
+    "notes": [{ "title": "Kurzer Titel", "text": "Depotweite Beobachtung, z. B. Überschneidungen, gemeinsame Treiber, Währung, wichtigster Termin." }],
+    "positions": [
+      {
+        "id": "gold (fest, nie ändern)",
+        "name": "Voller Produktname",
+        "short": "Kurzname",
+        "type": "ETF, ETC oder Zertifikat mit Kurzbeschreibung",
+        "isin": "ISIN",
+        "wkn": "WKN",
+        "ticker": "Kürzel",
+        "tvSymbol": "XETR:PPFB (Chart-Symbol; beim Zertifikat XETR:IQQQ als Vergleich)",
+        "chartNote": "Optional: Hinweis, wenn der Chart nur ein Vergleich ist",
+        "underlying": "Basiswert",
+        "buyPrice": 87.41,
+        "price": 65.085,
+        "priceAsOf": "Börse und Datum des Kurses",
+        "priceSource": { "name": "Quelle", "url": "https://..." },
+        "priceNote": "Nur wenn price null ist: warum kein Kurs",
+        "stance": "rueckenwind | neutral | gegenwind",
+        "headline": "Eine Zeile zur Lage",
+        "situation": "Was seit dem letzten Bericht passiert ist, drei bis fünf Sätze.",
+        "tailwinds": ["Was für die Anlage spricht"],
+        "headwinds": ["Was gegen die Anlage spricht"],
+        "meaning": "Was das für Michel heißt: sachlich, mit Bezug zum Raster, ohne Kauf- oder Verkaufsbefehl.",
+        "watch": ["Worauf er achten sollte"],
+        "product": "Produktart, Kosten, besondere Risiken",
+        "sources": [{ "name": "Quelle", "title": "Titel", "url": "https://..." }]
+      }
+    ]
+  },
   "excluded": [
     { "name": "Anthropic (ANT)", "reason": "Claude wird von Anthropic entwickelt. Um Interessenkonflikte zu vermeiden, gibt diese Seite zu Anthropic keine Einschätzung ab." }
   ],
