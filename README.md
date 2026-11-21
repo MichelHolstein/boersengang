@@ -1,6 +1,6 @@
 # Börsenradar
 
-Private Website mit einem Marktüberblick zum Aktienmarkt und Long-, Short- oder Neutral-Einschätzungen zu einzelnen Aktien. Ein neuer Bericht erscheint etwa alle drei Tage.
+Private Website mit einem Marktüberblick zum Aktienmarkt und Long-, Short- oder Neutral-Einschätzungen zu einzelnen Aktien. Ein neuer Bericht erscheint an jedem Xetra-Handelstag vor Handelsbeginn um 9 Uhr.
 
 **Keine Anlageberatung.** Die Seite ordnet öffentliche Nachrichten nach einem festen Punkteraster ein. Sie ist passwortgeschützt und nur für den privaten Gebrauch bestimmt.
 

@@ -2,7 +2,7 @@
   "date": "JJJJ-MM-TT",
   "title": "Marktlage am 24. November 2026",
   "generatedAt": "2026-11-24T07:00:00+01:00",
-  "nextUpdate": "JJJJ-MM-TT (heute + 3 Tage)",
+  "nextUpdate": "JJJJ-MM-TT (nächster Xetra-Handelstag)",
   "schemaVersion": 1,
   "light": {
     "status": "rot | gelb | gruen",
