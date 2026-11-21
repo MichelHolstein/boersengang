@@ -1,0 +1,6 @@
+# Klartext-Berichte niemals einchecken
+*.plain.json
+plain/
+tmp/
+node_modules/
+.DS_Store
