@@ -44,6 +44,8 @@ for (const p of report.picks || []) {
   const expected = total >= longMin ? "long" : total <= shortMax ? "short" : "neutral";
   if (p.signal !== expected) errors.push(`${p.ticker}: signal ist "${p.signal}", nach Punkten (${total}) wäre es "${expected}".`);
   if (String(p.ticker || "").match(/[^A-Za-z0-9-]/)) errors.push(`${p.ticker}: ticker nur aus Buchstaben, Ziffern und Bindestrich.`);
+  if (p.tvSymbol !== undefined && !/^[A-Z_]{2,12}:[A-Z0-9._]{1,15}$/.test(p.tvSymbol)) errors.push(`${p.ticker}: tvSymbol muss wie XETR:SIE aussehen.`);
+  if (p.tvSymbol === undefined) warnings.push(`${p.ticker}: tvSymbol fehlt, Live-Chart wird aus market abgeleitet.`);
   for (const src of p.sources || []) {
     if (!/^https:\/\//.test(src.url || "")) errors.push(`${p.ticker}: Quelle ohne https-URL (${src.name}).`);
   }

@@ -37,6 +37,7 @@
   "picks": [
     {
       "ticker": "SIE",
+      "tvSymbol": "XETR:SIE (Börse:Kürzel für die Live-Charts; Xetra = XETR, Nasdaq = NASDAQ, NYSE = NYSE)",
       "name": "Siemens",
       "market": "Xetra",
       "sector": "Industrie und Software",
