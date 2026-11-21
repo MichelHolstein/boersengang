@@ -35,3 +35,7 @@ Achtung: Das erzeugt ein neues Schlüsselpaar. Alte Berichte sind danach nicht m
 ## Punkteraster
 
 Sechs Kategorien mit je -2 bis +2 Punkten: Ereignisse (doppelt gewichtet), Analysten, Trend und Momentum, Positionierung, Qualität und Bilanz, Bewertung. Long ab +4, Short-Kandidat ab -4, sonst Neutral. Bei roter Marktampel gilt Long erst ab +5, bei grüner Short erst ab -5.
+
+## Vorlage
+
+`tools/report-template.json` zeigt alle Felder eines Berichts. Die echten Berichte liegen nur verschlüsselt in `data/reports/`.

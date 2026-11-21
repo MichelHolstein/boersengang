@@ -1,0 +1,65 @@
+{
+  "date": "JJJJ-MM-TT",
+  "title": "Marktlage am 24. November 2026",
+  "generatedAt": "2026-11-24T07:00:00+01:00",
+  "nextUpdate": "JJJJ-MM-TT (heute + 3 Tage)",
+  "schemaVersion": 1,
+  "light": {
+    "status": "rot | gelb | gruen",
+    "label": "Kurzes Label, z. B. Erhöhtes Risiko",
+    "text": "Ein bis zwei Sätze, was die Ampel für die Einschätzungen bedeutet.",
+    "reasons": ["Grund 1", "Grund 2", "Grund 3"]
+  },
+  "summary": "Drei bis fünf Sätze Kurzüberblick über die Marktlage.",
+  "indices": [
+    {
+      "name": "S&P 500",
+      "value": "6.910,39",
+      "change": "−3,70 %",
+      "changeDir": "down",
+      "asOf": "Fr., 20.11.",
+      "note": "Kurze Einordnung",
+      "sources": [{ "name": "Quelle", "url": "https://..." }]
+    }
+  ],
+  "news": [
+    {
+      "date": "20.11.",
+      "tag": "USA | Deutschland | KI | Zinsen | Börsengang | ...",
+      "title": "Überschrift",
+      "text": "Zwei bis vier Sätze in eigenen Worten.",
+      "sources": [{ "name": "Quelle", "url": "https://..." }]
+    }
+  ],
+  "calendar": [
+    { "date": "26.11.", "event": "Termin", "source": { "name": "Quelle (optional)", "url": "https://..." } }
+  ],
+  "picks": [
+    {
+      "ticker": "SIE",
+      "name": "Siemens",
+      "market": "Xetra",
+      "sector": "Industrie und Software",
+      "signal": "long | short | neutral (muss zur Punktsumme passen)",
+      "confidence": "hoch | mittel | niedrig",
+      "headline": "Eine Zeile mit dem Kern",
+      "priceInfo": "Kursinfo mit Datum",
+      "whatHappened": "Was passiert ist, drei bis fünf Sätze.",
+      "conflictNote": "Optional: Hinweis bei Beteiligung an Anthropic",
+      "scores": { "ereignisse": 0, "analysten": 0, "trend": 0, "positionierung": 0, "qualitaet": 0, "bewertung": 0 },
+      "longReasons": ["Grund für Long"],
+      "shortReasons": ["Grund für Short"],
+      "pricedIn": "Ist die Nachricht schon im Kurs?",
+      "catalysts": [{ "date": "11.02.2027", "event": "Nächster Termin" }],
+      "invalidation": "Was die Einschätzung kippen würde.",
+      "implementation": "Umsetzung für einen Privatanleger ohne Hebel.",
+      "sources": [{ "name": "Quelle", "title": "Titel des Artikels", "url": "https://..." }]
+    }
+  ],
+  "excluded": [
+    { "name": "Anthropic (ANT)", "reason": "Claude wird von Anthropic entwickelt. Um Interessenkonflikte zu vermeiden, gibt diese Seite zu Anthropic keine Einschätzung ab." }
+  ],
+  "paperUrl": "https://claude.ai/artifact/C2eJshCkJpVWD9bk9Cw3o4",
+  "methodNote": "Jede Aktie bekommt in sechs Kategorien minus 2 bis plus 2 Punkte; Ereignisse zählen doppelt. Long ab plus 4, Short-Kandidat ab minus 4. Bei roter Marktampel gilt für Long plus 5, bei grüner für Short minus 5. Zuversicht hoch bei mindestens vier gleichgerichteten Kategorien, mittel bei drei.",
+  "disclaimer": "Keine Anlageberatung. Die Seite ordnet öffentliche Nachrichten nach einem festen Raster ein. Kurse und Zahlen können veraltet sein; prüfe sie vor jeder Entscheidung bei deinem Broker."
+}
