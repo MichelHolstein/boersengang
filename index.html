@@ -538,7 +538,7 @@ footer p { margin: 0; max-width: 110ch; }
     h += '<div class="tm" id="tm" role="group" aria-label="Signal-Heatmap"></div>';
     h += '<div class="scale"><span>Short ' + signed(L.shortMax) + "</span><i></i><span>Long " + signed(L.longMin) + "</span><span>· Farbe nach Punkten, Größe nach Stärke des Signals</span></div></section>";
 
-    h += '<section class="card-box" aria-labelledby="hmTitle"><div class="sec-head"><div><h2 id="hmTitle">Markt-Heatmap live</h2><p>Kursveränderung nach Sektor, Kachelgröße nach Börsenwert.</p></div>';
+    h += '<section class="card-box" aria-labelledby="hmTitle"><div class="sec-head"><div><h2 id="hmTitle">Markt-Heatmap live</h2><p>Kursveränderung nach Sektor, Kachelgröße nach Börsenwert. Beim DAX liefert TradingView hier nur die Schlusskurse des Vortags.</p></div>';
     h += '<div style="display:flex;gap:8px;flex-wrap:wrap"><div class="seg" role="group" aria-label="Index">' + HM_SRC.map(function (x) { return '<button type="button" data-hs="' + x[0] + '" aria-pressed="' + (x[0] === hmSrc) + '">' + x[1] + "</button>"; }).join("") + "</div>";
     h += '<div class="seg" role="group" aria-label="Zeitraum">' + HM_PER.map(function (x) { return '<button type="button" data-hp="' + x[0] + '" aria-pressed="' + (x[0] === hmPer) + '">' + x[1] + "</button>"; }).join("") + "</div></div></div>";
     h += '<div class="hm-live" id="hmLive"></div></section>';
