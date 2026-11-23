@@ -461,11 +461,33 @@ footer p { margin: 0; max-width: 110ch; }
   var HM_PER = [["change", "Tag"], ["Perf.W", "Woche"], ["Perf.1M", "Monat"], ["Perf.YTD", "Seit 1.1."]];
   var hmSrc = "SPX500", hmPer = "change";
   try { var hs = JSON.parse(localStorage.getItem("boersenradar.hm") || "{}"); if (HM_SRC.some(function (x) { return x[0] === hs.s; })) hmSrc = hs.s; if (HM_PER.some(function (x) { return x[0] === hs.p; })) hmPer = hs.p; } catch (e) {}
+  /* Die TradingView-Heatmap kennt beim DAX nur Xetra-Schlusskurse. Für die Tagesansicht zeigt die Seite
+     deshalb alle DAX-Werte live über Gettex, nach Branchen gruppiert.
+     DAX-Zusammensetzung seit 22.06.2026 (Hochtief für Porsche SE); nächste Überprüfung am 3.12.2026. */
+  var DAX_LIVE = [
+    ["Industrie", [["SIE", "Siemens"], ["ENR", "Siemens Energy"], ["AIR", "Airbus"], ["RHM", "Rheinmetall"], ["MTX", "MTU Aero Engines"], ["DHL", "DHL Group"], ["G1A", "GEA"], ["HOT", "Hochtief"]]],
+    ["Finanzen", [["ALV", "Allianz"], ["MUV2", "Münchener Rück"], ["HNR1", "Hannover Rück"], ["DBK", "Deutsche Bank"], ["CBK", "Commerzbank"], ["DB1", "Deutsche Börse"]]],
+    ["Technologie", [["SAP", "SAP"], ["IFX", "Infineon"], ["G24", "Scout24"]]],
+    ["Auto und Konsum", [["MBG", "Mercedes-Benz"], ["BMW", "BMW"], ["VOW3", "Volkswagen Vz."], ["DTG", "Daimler Truck"], ["CON", "Continental"], ["ADS", "adidas"], ["ZAL", "Zalando"], ["BEI", "Beiersdorf"], ["HEN3", "Henkel Vz."]]],
+    ["Gesundheit", [["MRK", "Merck"], ["BAYN", "Bayer"], ["SHL", "Siemens Healthineers"], ["FRE", "Fresenius"], ["FME", "Fresenius Medical Care"], ["QIA", "Qiagen"]]],
+    ["Chemie und Baustoffe", [["BAS", "BASF"], ["SY1", "Symrise"], ["BNR", "Brenntag"], ["HEI", "Heidelberg Materials"]]],
+    ["Versorger, Telekom, Immobilien", [["RWE", "RWE"], ["EOAN", "E.ON"], ["DTE", "Deutsche Telekom"], ["VNA", "Vonovia"]]]
+  ];
   function liveHeatmap() {
     var el = document.getElementById("hmLive");
     if (!el) return;
-    el.innerHTML = tvFrame("stock-heatmap", { exchanges: [], dataSource: hmSrc, grouping: "sector", blockSize: "market_cap_basic", blockColor: hmPer, locale: "de_DE", symbolUrl: "", colorTheme: "dark", hasTopBar: false, isDataSetEnabled: false, isZoomEnabled: true, hasSymbolTooltip: true, isMonoSize: false, width: "100%", height: "100%" }, "Markt-Heatmap", "100%", true);
+    var note = document.getElementById("hmNote");
     try { localStorage.setItem("boersenradar.hm", JSON.stringify({ s: hmSrc, p: hmPer })); } catch (e) {}
+    if (hmSrc === "DAX" && hmPer === "change") {
+      var groups = DAX_LIVE.map(function (g) { return { name: g[0], originalName: g[0], symbols: g[1].map(function (x) { return { name: "GETTEX:" + x[0], displayName: x[1] }; }) }; });
+      el.innerHTML = tvFrame("market-quotes", { width: "100%", height: "100%", symbolsGroups: groups, showSymbolLogo: true, isTransparent: true, colorTheme: "dark", locale: "de_DE" }, "DAX-Werte live", "100%", true);
+      if (note) note.textContent = "DAX heute: alle 40 Werte live über Gettex, nach Branchen. Eine farbige Heatmap gibt TradingView für den DAX nur mit Schlusskursen her, deshalb hier die Liste.";
+      return;
+    }
+    if (note) note.textContent = hmSrc === "DAX"
+      ? "Stand: letzter Xetra-Schlusskurs. Die Bewegung des laufenden Tages kommt erst nach Handelsschluss dazu; für heute „Tag“ wählen."
+      : "US-Kurse sind verzögert. Vor Handelsbeginn in New York um 15:30 Uhr zeigt die Heatmap den Stand vom letzten US-Handelsschluss.";
+    el.innerHTML = tvFrame("stock-heatmap", { exchanges: [], dataSource: hmSrc, grouping: "sector", blockSize: "market_cap_basic", blockColor: hmPer, locale: "de_DE", symbolUrl: "", colorTheme: "dark", hasTopBar: false, isDataSetEnabled: false, isZoomEnabled: true, hasSymbolTooltip: true, isMonoSize: false, width: "100%", height: "100%" }, "Markt-Heatmap", "100%", true);
   }
 
   /* Empfehlung aus Signal und Zuversicht */
@@ -538,10 +560,10 @@ footer p { margin: 0; max-width: 110ch; }
     h += '<div class="tm" id="tm" role="group" aria-label="Signal-Heatmap"></div>';
     h += '<div class="scale"><span>Short ' + signed(L.shortMax) + "</span><i></i><span>Long " + signed(L.longMin) + "</span><span>· Farbe nach Punkten, Größe nach Stärke des Signals</span></div></section>";
 
-    h += '<section class="card-box" aria-labelledby="hmTitle"><div class="sec-head"><div><h2 id="hmTitle">Markt-Heatmap live</h2><p>Kursveränderung nach Sektor, Kachelgröße nach Börsenwert. Beim DAX liefert TradingView hier nur die Schlusskurse des Vortags.</p></div>';
+    h += '<section class="card-box" aria-labelledby="hmTitle"><div class="sec-head"><div><h2 id="hmTitle">Markt-Heatmap live</h2><p>Kursveränderung nach Sektor, Kachelgröße nach Börsenwert.</p></div>';
     h += '<div style="display:flex;gap:8px;flex-wrap:wrap"><div class="seg" role="group" aria-label="Index">' + HM_SRC.map(function (x) { return '<button type="button" data-hs="' + x[0] + '" aria-pressed="' + (x[0] === hmSrc) + '">' + x[1] + "</button>"; }).join("") + "</div>";
     h += '<div class="seg" role="group" aria-label="Zeitraum">' + HM_PER.map(function (x) { return '<button type="button" data-hp="' + x[0] + '" aria-pressed="' + (x[0] === hmPer) + '">' + x[1] + "</button>"; }).join("") + "</div></div></div>";
-    h += '<div class="hm-live" id="hmLive"></div></section>';
+    h += '<div class="hm-live" id="hmLive"></div><p class="livenote" id="hmNote" style="margin:8px 0 0"></p></section>';
 
     var tags = ["Alle"];
     arr(r.news).forEach(function (n) { if (n.tag && tags.indexOf(n.tag) < 0) tags.push(n.tag); });
