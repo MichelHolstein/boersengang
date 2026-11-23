@@ -432,11 +432,18 @@ footer p { margin: 0; max-width: 110ch; }
   /* Live-Daten von TradingView: nur als fremde iframes, kein fremdes Skript auf dieser Seite */
   var TV_RE = /^[A-Z_]{2,12}:[A-Z0-9._]{1,15}$/;
   var EXCH = { xetra: "XETR", nasdaq: "NASDAQ", nyse: "NYSE" };
+  /* Xetra liefert in TradingView-Widgets nur Schlusskurse vom Vortag, Gettex dagegen Echtzeitkurse.
+     Deshalb werden XETR-Symbole für die Anzeige auf GETTEX umgestellt; Gold und Silber laufen über Tradegate (verzögert), der DAX über einen Echtzeit-CFD-Kurs. */
+  var LIVE_MAP = { "XETR:PPFB": "TRADEGATE:PPFB", "XETR:PPFD": "TRADEGATE:PPFD", "XETR:DAX": "FOREXCOM:GRXEUR" };
+  function liveSym(s) {
+    if (LIVE_MAP[s]) return LIVE_MAP[s];
+    return s.indexOf("XETR:") === 0 ? "GETTEX:" + s.slice(5) : s;
+  }
   function tvSym(p) {
-    if (p && TV_RE.test(String(p.tvSymbol || ""))) return p.tvSymbol;
+    if (p && TV_RE.test(String(p.tvSymbol || ""))) return liveSym(p.tvSymbol);
     var ex = EXCH[String((p && p.market) || "").toLowerCase()];
     var s = ex ? ex + ":" + String(p.ticker || "").toUpperCase() : "";
-    return TV_RE.test(s) ? s : null;
+    return TV_RE.test(s) ? liveSym(s) : null;
   }
   function tvFrame(name, cfg, title, height, lazy) {
     var src = "https://www.tradingview-widget.com/embed-widget/" + name + "/?locale=de_DE#" + encodeURIComponent(JSON.stringify(cfg));
@@ -444,7 +451,7 @@ footer p { margin: 0; max-width: 110ch; }
       ' sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox" referrerpolicy="strict-origin-when-cross-origin"></iframe>';
   }
   var TAPE = [
-    ["FOREXCOM:SPXUSD", "S&P 500"], ["FOREXCOM:NSXUSD", "Nasdaq 100"], ["FOREXCOM:DJI", "Dow Jones"], ["XETR:DAX", "DAX"],
+    ["FOREXCOM:SPXUSD", "S&P 500"], ["FOREXCOM:NSXUSD", "Nasdaq 100"], ["FOREXCOM:DJI", "Dow Jones"], ["FOREXCOM:GRXEUR", "DAX"],
     ["FX_IDC:EURUSD", "EUR/USD"], ["TVC:US10Y", "US-Rendite 10J"], ["TVC:GOLD", "Gold"], ["TVC:UKOIL", "Brent"], ["BITSTAMP:BTCUSD", "Bitcoin"]
   ];
   function tapeHtml() {
@@ -846,7 +853,7 @@ footer p { margin: 0; max-width: 110ch; }
     h += '<div class="fact"><h4>Deine Position</h4><label class="inp">Stückzahl<input type="text" inputmode="decimal" autocomplete="off" data-qty="' + esc(p.id) + '" value="' + esc(q) + '"></label>';
     if (!isNum(p.price)) h += '<label class="inp">Aktueller Kurs aus deiner App (€)<input type="text" inputmode="decimal" autocomplete="off" data-px="' + esc(p.id) + '" value="' + esc(loadLocal(PX_KEY)[p.id] || "") + '"></label>';
     h += '<p class="calc" id="posCalc"></p><p class="livenote" style="margin:0">Wird nur in diesem Browser gespeichert.</p></div></div>';
-    var ts = TV_RE.test(String(p.tvSymbol || "")) ? p.tvSymbol : null;
+    var ts = TV_RE.test(String(p.tvSymbol || "")) ? liveSym(p.tvSymbol) : null;
     if (ts) {
       h += '<div class="sec"><div class="eyebrow">Kursverlauf live</div><div class="charts" style="grid-template-columns:1fr"><div>' +
         tvFrame("mini-symbol-overview", { symbol: ts, width: "100%", height: "100%", dateRange: "12M", colorTheme: "dark", isTransparent: true, autosize: true, largeChartUrl: "" }, "Kursverlauf " + p.name, "300px", false) + "</div></div>";
