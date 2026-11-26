@@ -473,15 +473,31 @@ footer p { margin: 0; max-width: 110ch; }
     ["Chemie und Baustoffe", [["BAS", "BASF"], ["SY1", "Symrise"], ["BNR", "Brenntag"], ["HEI", "Heidelberg Materials"]]],
     ["Versorger, Telekom, Immobilien", [["RWE", "RWE"], ["EOAN", "E.ON"], ["DTE", "Deutsche Telekom"], ["VNA", "Vonovia"]]]
   ];
+  /* Die aktuelle Liste kommt aus data/dax.json (pflegt die Automatik nach Indexänderungen); DAX_LIVE ist nur die Reserve. */
+  var daxData = null;
+  function daxGroups() {
+    return daxData || DAX_LIVE.map(function (g) { return { sector: g[0], members: g[1].map(function (x) { return { ticker: x[0], name: x[1] }; }) }; });
+  }
+  function loadDax() {
+    getJSON("dax.json").then(function (d) {
+      var ok = d && Array.isArray(d.groups) && d.groups.length > 0 && d.groups.every(function (g) {
+        return g && typeof g.sector === "string" && Array.isArray(g.members) && g.members.every(function (m) { return m && /^[A-Z0-9]{1,6}$/.test(String(m.ticker)) && typeof m.name === "string"; });
+      });
+      if (!ok) return;
+      daxData = d.groups;
+      if (hmSrc === "DAX" && hmPer === "change") liveHeatmap();
+    }, function () {});
+  }
   function liveHeatmap() {
     var el = document.getElementById("hmLive");
     if (!el) return;
     var note = document.getElementById("hmNote");
     try { localStorage.setItem("boersenradar.hm", JSON.stringify({ s: hmSrc, p: hmPer })); } catch (e) {}
     if (hmSrc === "DAX" && hmPer === "change") {
-      var groups = DAX_LIVE.map(function (g) { return { name: g[0], originalName: g[0], symbols: g[1].map(function (x) { return { name: "GETTEX:" + x[0], displayName: x[1] }; }) }; });
+      var dg = daxGroups(), nDax = 0;
+      var groups = dg.map(function (g) { nDax += g.members.length; return { name: g.sector, originalName: g.sector, symbols: g.members.map(function (x) { return { name: "GETTEX:" + x.ticker, displayName: x.name }; }) }; });
       el.innerHTML = tvFrame("market-quotes", { width: "100%", height: "100%", symbolsGroups: groups, showSymbolLogo: true, isTransparent: true, colorTheme: "dark", locale: "de_DE" }, "DAX-Werte live", "100%", true);
-      if (note) note.textContent = "DAX heute: alle 40 Werte live über Gettex, nach Branchen. Eine farbige Heatmap gibt TradingView für den DAX nur mit Schlusskursen her, deshalb hier die Liste.";
+      if (note) note.textContent = "DAX heute: alle " + nDax + " Werte live über Gettex, nach Branchen. Eine farbige Heatmap gibt TradingView für den DAX nur mit Schlusskursen her, deshalb hier die Liste.";
       return;
     }
     if (note) note.textContent = hmSrc === "DAX"
@@ -590,6 +606,9 @@ footer p { margin: 0; max-width: 110ch; }
       h += '<li><span class="when">' + esc(c.date) + '</span><span class="dot"></span><span class="what">' + esc(c.event) + (c.source ? ' <span class="links" style="display:inline">· ' + link(c.source) + "</span>" : "") + "</span></li>";
     });
     h += "</ol></div></section>";
+
+    h += '<section class="card-box" aria-labelledby="bzTitle"><div class="sec-head"><div><h2 id="bzTitle">Bilanz der Signale</h2><p>Wie sich jede Aktie seit ihrem Long- oder Short-Signal im Vergleich zum DAX oder S&amp;P 500 entwickelt hat. Gerechnet wird aus allen gespeicherten Berichten.</p></div></div>';
+    h += '<details class="live" id="bilanz"><summary>Bilanz berechnen</summary><div id="bilanzBox" style="margin-top:12px"></div></details></section>';
 
     h += "<footer><p><strong>So entstehen die Einschätzungen.</strong> " + esc(r.methodNote || "") + (safeUrl(r.paperUrl) ? ' Grundlage ist das <a href="' + esc(r.paperUrl) + '" target="_blank" rel="noopener">Research Paper zu Long- und Short-Signalen</a>.' : "") + "</p>";
     h += "<p><strong>So entsteht die Empfehlung.</strong> Long mit hoher Zuversicht heißt Kaufen, mit mittlerer Zuversicht Kaufen mit kleiner Position, sonst Beobachten. Short-Kandidaten stehen unter Meiden; ein aktiver Short ist damit nicht gemeint.</p>";
@@ -781,6 +800,8 @@ footer p { margin: 0; max-width: 110ch; }
     });
     var lq = document.getElementById("liveQuotes");
     if (lq) lq.addEventListener("toggle", function () { if (lq.open) liveQuotes(); });
+    var bz = document.getElementById("bilanz");
+    if (bz) bz.addEventListener("toggle", function () { if (bz.open) computeBilanz(); });
   }
   /* Ein Klick auf Kachel, Idee oder Tabellenzeile öffnet die Detailansicht */
   document.getElementById("app").addEventListener("click", function (e) {
@@ -871,7 +892,10 @@ footer p { margin: 0; max-width: 110ch; }
     h += '<div class="fact"><h4>Kurs</h4><p>Einstand <span class="mono">' + num(p.buyPrice, p.buyPrice < 10 ? 3 : 2) + " €</span></p>";
     if (isNum(p.price)) h += '<p>Aktuell <span class="mono">' + num(p.price, p.price < 10 ? 3 : 2) + " €</span> (" + esc(p.priceAsOf) + (p.priceSource ? ", " + link(p.priceSource) : "") + ")</p>";
     else h += "<p>" + esc(p.priceNote || "Kein aktueller Kurs verfügbar.") + "</p>";
-    h += '<p>Basiswert: ' + esc(p.underlying) + "</p></div>";
+    h += '<p>Basiswert: ' + esc(p.underlying) + "</p>";
+    var uq = p.underlyingQuote;
+    if (uq && isNum(uq.level)) h += '<p>Indexstand <span class="mono">' + num(uq.level, 2) + " " + esc(uq.currency || "") + "</span>" + (isNum(uq.changePct) ? ' <span class="c-' + perfCls(uq.changePct) + '">' + pct(uq.changePct) + "</span>" : "") + " (" + esc(uq.asOf || "") + (uq.source ? ", " + link(uq.source) : "") + ")</p>";
+    h += "</div>";
     h += '<div class="fact"><h4>Deine Position</h4><label class="inp">Stückzahl<input type="text" inputmode="decimal" autocomplete="off" data-qty="' + esc(p.id) + '" value="' + esc(q) + '"></label>';
     if (!isNum(p.price)) h += '<label class="inp">Aktueller Kurs aus deiner App (€)<input type="text" inputmode="decimal" autocomplete="off" data-px="' + esc(p.id) + '" value="' + esc(loadLocal(PX_KEY)[p.id] || "") + '"></label>';
     h += '<p class="calc" id="posCalc"></p><p class="livenote" style="margin:0">Wird nur in diesem Browser gespeichert.</p></div></div>';
@@ -1010,6 +1034,99 @@ footer p { margin: 0; max-width: 110ch; }
   var rz;
   window.addEventListener("resize", function () { clearTimeout(rz); rz = setTimeout(function () { if (current) layoutTreemap(); }, 120); });
 
+
+  /* Bilanz der Signale: aus allen Berichten mit Schlusskursen (price) und Indexständen (benchmarks).
+     Ein Signal beginnt mit dem ersten Bericht, in dem die Aktie Long oder Short ist, und endet,
+     sobald sie Neutral wird, das Signal dreht oder die Aktie aus der Watchlist fällt.
+     Einstieg ist der Schlusskurs vor dem jeweiligen Bericht. */
+  var bilanzCache = null;
+  function benchKey(p) {
+    var c = String(p.currency || "").toUpperCase();
+    if (c === "EUR") return "DAX";
+    if (c === "USD") return "SPX";
+    return /^(XETR|GETTEX|FWB|TRADEGATE|SWB):/.test(String(p.tvSymbol || "")) ? "DAX" : "SPX";
+  }
+  function buildBilanz(reps) {
+    var runs = [], open = {}, first = null, last = null;
+    function close(o, price, bench, date) {
+      o.cur = price; o.curBench = bench; o.curDate = date; o.open = false; o.end = date;
+      runs.push(o); delete open[o.ticker];
+    }
+    reps.forEach(function (r) {
+      var b = r.benchmarks || {};
+      if (!(isNum(b.DAX) && b.DAX > 0 && isNum(b.SPX) && b.SPX > 0)) return;
+      if (!first) first = r.date;
+      last = r.date;
+      var seen = {};
+      arr(r.picks).forEach(function (p) {
+        var t = String(p.ticker || "");
+        if (!t) return;
+        seen[t] = true;
+        var o = open[t], sig = p.signal === "long" || p.signal === "short" ? p.signal : "neutral";
+        if (!(isNum(p.price) && p.price > 0)) { if (o && o.signal !== sig) close(o, o.cur, o.curBench, o.curDate); return; }
+        var k = benchKey(p), bv = b[k];
+        if (o && o.signal === sig) { o.cur = p.price; o.curBench = b[o.bench]; o.curDate = r.date; return; }
+        if (o) close(o, p.price, b[o.bench], r.date);
+        if (sig !== "neutral") open[t] = { ticker: t, name: p.name || t, signal: sig, bench: k, start: r.date, entry: p.price, entryBench: bv, cur: p.price, curBench: bv, curDate: r.date, open: true };
+      });
+      Object.keys(open).forEach(function (t) { if (!seen[t]) { var o = open[t]; close(o, o.cur, o.curBench, o.curDate); } });
+    });
+    Object.keys(open).forEach(function (t) { runs.push(open[t]); });
+    runs.forEach(function (o) {
+      o.ret = (o.cur / o.entry - 1) * 100;
+      o.bret = (o.curBench / o.entryBench - 1) * 100;
+      o.ex = o.ret - o.bret;
+      o.hit = o.signal === "long" ? o.ex > 0 : o.ex < 0;
+    });
+    runs.sort(function (a, b) { return a.open !== b.open ? (a.open ? -1 : 1) : (b.start > a.start ? 1 : b.start < a.start ? -1 : 0); });
+    return { runs: runs, first: first, last: last };
+  }
+  function bilanzStats(runs, sig) {
+    var l = runs.filter(function (o) { return o.signal === sig; });
+    var hits = l.filter(function (o) { return o.hit; }).length;
+    var avg = l.length ? l.reduce(function (s, o) { return s + o.ex; }, 0) / l.length : null;
+    return { n: l.length, closed: l.filter(function (o) { return !o.open; }).length, rate: l.length ? hits / l.length * 100 : null, avg: avg };
+  }
+  function pp(n) { return (n > 0 ? "+" : n < 0 ? "−" : "") + num(Math.abs(n), 1) + " Pp."; }
+  function renderBilanz(res) {
+    if (!res.first) return '<p class="livenote" style="margin:0">Noch keine Daten. Die Bilanz beginnt mit dem ersten Bericht, der Schlusskurse und Indexstände enthält; ältere Berichte haben diese Zahlen nicht.</p>';
+    var L = bilanzStats(res.runs, "long"), S = bilanzStats(res.runs, "short");
+    var h = '<div class="dp-kpis">';
+    h += '<div class="dp-kpi"><span>Long-Signale</span><b>' + L.n + "</b><small>" + L.closed + " abgeschlossen</small></div>";
+    h += '<div class="dp-kpi"><span>Long besser als Index</span><b class="c-' + (L.rate == null ? "muted" : L.rate >= 50 ? "long" : "short") + '">' + (L.rate == null ? "–" : num(L.rate, 0) + " %") + "</b><small>" + (L.avg == null ? "noch keine" : "im Schnitt " + pp(L.avg)) + "</small></div>";
+    h += '<div class="dp-kpi"><span>Short schlechter als Index</span><b class="c-' + (S.rate == null ? "muted" : S.rate >= 50 ? "long" : "short") + '">' + (S.rate == null ? "–" : num(S.rate, 0) + " %") + "</b><small>" + S.n + " Signale" + (S.avg == null ? "" : ", im Schnitt " + pp(S.avg)) + "</small></div>";
+    h += "</div>";
+    if (L.n + S.n < 20) h += '<p class="livenote" style="margin:10px 0 0">Noch wenige Signale. Aussagekräftig wird die Bilanz erst nach einigen Monaten und mindestens 20 bis 30 abgeschlossenen Signalen; bis dahin kann Zufall das Bild stark prägen.</p>';
+    if (!res.runs.length) return h + '<p class="livenote" style="margin:10px 0 0">Seit dem ' + fmtDate(res.first) + " gab es noch kein Long- oder Short-Signal.</p>";
+    h += '<div class="tbl-wrap"><table class="wl"><thead><tr><th>Aktie</th><th>Signal</th><th>Zeitraum</th><th>Aktie</th><th>Index</th><th>Unterschied</th><th>Ergebnis</th></tr></thead><tbody>';
+    res.runs.forEach(function (o) {
+      var sc = o.signal === "long" ? "long" : "short";
+      h += "<tr><td><b>" + esc(o.name) + '</b> <span class="mono" style="color:var(--faint)">' + esc(o.ticker) + "</span></td>";
+      h += '<td><span class="pill c-' + sc + " bg-" + sc + '">' + (o.signal === "long" ? "Long" : "Short") + "</span></td>";
+      h += "<td>" + (o.open ? "seit " + fmtDate(o.start) : fmtDate(o.start) + " bis " + fmtDate(o.end)) + "</td>";
+      h += '<td class="mono c-' + perfCls(o.ret) + '">' + pct(o.ret) + "</td>";
+      h += '<td class="mono">' + pct(o.bret) + ' <span style="color:var(--faint)">' + (o.bench === "DAX" ? "DAX" : "S&amp;P 500") + "</span></td>";
+      h += '<td class="mono c-' + (o.ex > 0 ? "long" : o.ex < 0 ? "short" : "neutral") + '">' + pp(o.ex) + "</td>";
+      h += '<td class="c-' + (o.hit ? "long" : "short") + '">' + (o.hit ? "Treffer" : "Daneben") + (o.open ? ' <span style="color:var(--faint)">(läuft)</span>' : "") + "</td></tr>";
+    });
+    h += "</tbody></table></div>";
+    h += '<p class="livenote" style="margin:10px 0 0">Daten vom ' + fmtDate(res.first) + " bis " + fmtDate(res.last) + ". Einstieg ist der Schlusskurs vor dem Bericht, in dem das Signal zuerst erschien. Long ist ein Treffer, wenn die Aktie besser lief als ihr Index; Short, wenn sie schlechter lief. Ohne Gebühren, Steuern und Dividenden; keine Anlageberatung.</p>";
+    return h;
+  }
+  async function computeBilanz() {
+    var box = document.getElementById("bilanzBox");
+    if (!box) return;
+    var key = reports.map(function (r) { return r.date; }).join(",");
+    if (bilanzCache && bilanzCache.key === key) { box.innerHTML = bilanzCache.html; return; }
+    box.innerHTML = '<p class="livenote" style="margin:0">Berichte werden entschlüsselt.</p>';
+    var dates = reports.map(function (r) { return r.date; }).sort(), reps = [];
+    for (var i = 0; i < dates.length; i++) { try { reps.push(await decryptReport(dates[i])); } catch (e) {} }
+    var html = renderBilanz(buildBilanz(reps));
+    bilanzCache = { key: key, html: html };
+    var b2 = document.getElementById("bilanzBox");
+    if (b2) b2.innerHTML = html;
+  }
+
   /* Entschlüsselung */
   function b64ToBytes(s) { var bin = atob(String(s || "")); var u = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u; }
   function bytesToB64(buf) { var u = new Uint8Array(buf), s = ""; for (var i = 0; i < u.length; i++) s += String.fromCharCode(u[i]); return btoa(s); }
@@ -1050,6 +1167,7 @@ footer p { margin: 0; max-width: 110ch; }
   }
   async function afterUnlock() {
     document.getElementById("ctl").hidden = false;
+    loadDax();
     setState("Bericht wird entschlüsselt.");
     try {
       var idx = await getJSON("index.json");

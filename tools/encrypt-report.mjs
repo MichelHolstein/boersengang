@@ -8,7 +8,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const MAX_REPORTS = 60;
+// Alle Berichte bleiben erhalten, weil die Website daraus die Bilanz der Signale berechnet.
+const MAX_REPORTS = 1500;
 const CATS = ["ereignisse", "analysten", "trend", "positionierung", "qualitaet", "bewertung"];
 
 const file = process.argv[2];
@@ -30,6 +31,11 @@ const warnings = [];
 if (!/^\d{4}-\d{2}-\d{2}$/.test(report.date || "")) errors.push("Feld date fehlt oder ist nicht JJJJ-MM-TT.");
 if (!Array.isArray(report.picks) || report.picks.length === 0) errors.push("picks fehlt oder ist leer.");
 const light = report.light && report.light.status;
+// Schlusskurse der Indizes vom letzten Handelstag, Grundlage der Bilanz
+const bm = report.benchmarks;
+if (!bm || !(typeof bm.DAX === "number" && bm.DAX > 0) || !(typeof bm.SPX === "number" && bm.SPX > 0)) {
+  errors.push("benchmarks.DAX und benchmarks.SPX müssen Zahlen größer 0 sein (Schlussstände von DAX und S&P 500 vom letzten Handelstag).");
+}
 if (!["rot", "gelb", "gruen"].includes(light)) errors.push("light.status muss rot, gelb oder gruen sein.");
 for (const p of report.picks || []) {
   const s = p.scores || {};
@@ -46,6 +52,12 @@ for (const p of report.picks || []) {
   if (String(p.ticker || "").match(/[^A-Za-z0-9-]/)) errors.push(`${p.ticker}: ticker nur aus Buchstaben, Ziffern und Bindestrich.`);
   if (p.tvSymbol !== undefined && !/^[A-Z_]{2,12}:[A-Z0-9._]{1,15}$/.test(p.tvSymbol)) errors.push(`${p.ticker}: tvSymbol muss wie XETR:SIE aussehen.`);
   if (p.tvSymbol === undefined) warnings.push(`${p.ticker}: tvSymbol fehlt, Live-Chart wird aus market abgeleitet.`);
+  // Schlusskurs für die Bilanz: bei Long und Short Pflicht, sonst empfohlen
+  const hasPrice = typeof p.price === "number" && p.price > 0;
+  if (p.price !== undefined && p.price !== null && !hasPrice) errors.push(`${p.ticker}: price muss eine Zahl größer 0 oder null sein.`);
+  if ((p.signal === "long" || p.signal === "short") && !hasPrice) errors.push(`${p.ticker}: Bei Long und Short ist price (Schlusskurs vom letzten Handelstag als Zahl) Pflicht.`);
+  else if (!hasPrice) warnings.push(`${p.ticker}: price fehlt; die Bilanz kann den Wert nicht verfolgen.`);
+  if (hasPrice && !["EUR", "USD"].includes(p.currency)) errors.push(`${p.ticker}: currency muss EUR oder USD sein.`);
   for (const src of p.sources || []) {
     if (!/^https:\/\//.test(src.url || "")) errors.push(`${p.ticker}: Quelle ohne https-URL (${src.name}).`);
   }
@@ -61,12 +73,32 @@ if (pf !== undefined) {
     ids.add(p.id);
     if (!(typeof p.buyPrice === "number" && p.buyPrice > 0)) errors.push(`Depot ${n}: buyPrice muss eine Zahl größer 0 sein.`);
     if (p.price !== null && p.price !== undefined && !(typeof p.price === "number" && p.price > 0)) errors.push(`Depot ${n}: price muss eine Zahl größer 0 oder null sein.`);
+    const uq = p.underlyingQuote;
+    if (uq !== undefined && uq !== null && !(typeof uq.level === "number" && uq.level > 0)) errors.push(`Depot ${n}: underlyingQuote.level muss eine Zahl größer 0 sein.`);
+    if (uq && uq.source && !/^https:\/\//.test(uq.source.url || "")) errors.push(`Depot ${n}: underlyingQuote.source ohne https-URL.`);
     if (!["rueckenwind", "neutral", "gegenwind"].includes(p.stance)) errors.push(`Depot ${n}: stance muss rueckenwind, neutral oder gegenwind sein.`);
     if (p.tvSymbol !== undefined && !/^[A-Z_]{2,12}:[A-Z0-9._]{1,15}$/.test(p.tvSymbol)) errors.push(`Depot ${n}: tvSymbol muss wie XETR:EUNL aussehen.`);
     for (const src of [...(p.sources || []), ...(p.priceSource ? [p.priceSource] : [])]) {
       if (!/^https:\/\//.test(src.url || "")) errors.push(`Depot ${n}: Quelle ohne https-URL (${src.name}).`);
     }
   }
+}
+// DAX-Liste für die Live-Ansicht prüfen, falls sie geändert wurde
+try {
+  const dax = JSON.parse(await readFile(path.join(root, "data", "dax.json"), "utf8"));
+  const tickers = new Set();
+  if (!Array.isArray(dax.groups) || !dax.groups.length) errors.push("data/dax.json: groups fehlt.");
+  for (const g of dax.groups || []) {
+    if (typeof g.sector !== "string" || !Array.isArray(g.members)) { errors.push("data/dax.json: jede Gruppe braucht sector und members."); continue; }
+    for (const m of g.members) {
+      if (!/^[A-Z0-9]{1,6}$/.test(String(m.ticker)) || typeof m.name !== "string") errors.push(`data/dax.json: ungültiger Eintrag ${JSON.stringify(m)}.`);
+      if (tickers.has(m.ticker)) errors.push(`data/dax.json: ${m.ticker} doppelt.`);
+      tickers.add(m.ticker);
+    }
+  }
+  if (tickers.size !== 40) errors.push(`data/dax.json enthält ${tickers.size} statt 40 Werte.`);
+} catch (e) {
+  errors.push("data/dax.json fehlt oder ist kein gültiges JSON.");
 }
 if (/\s[–—]\s/.test(text)) warnings.push("Text enthält Gedankenstriche (– oder —).");
 if (/\bANT\b/.test(JSON.stringify((report.picks || []).map((p) => p.ticker)))) errors.push("Anthropic (ANT) darf nicht bewertet werden.");

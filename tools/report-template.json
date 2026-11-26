@@ -3,12 +3,21 @@
   "title": "Marktlage am 24. November 2026",
   "generatedAt": "2026-11-24T07:00:00+01:00",
   "nextUpdate": "JJJJ-MM-TT (nächster Xetra-Handelstag)",
+  "benchmarks": {
+    "DAX": 24802.78,
+    "SPX": 6910.39,
+    "asOf": "JJJJ-MM-TT (Datum der Schlussstände; DAX = Xetra-Schluss, SPX = S&P-500-Schluss vom letzten Handelstag, als Zahlen)"
+  },
   "schemaVersion": 1,
   "light": {
     "status": "rot | gelb | gruen",
     "label": "Kurzes Label, z. B. Erhöhtes Risiko",
     "text": "Ein bis zwei Sätze, was die Ampel für die Einschätzungen bedeutet.",
-    "reasons": ["Grund 1", "Grund 2", "Grund 3"]
+    "reasons": [
+      "Grund 1",
+      "Grund 2",
+      "Grund 3"
+    ]
   },
   "summary": "Drei bis fünf Sätze Kurzüberblick über die Marktlage.",
   "indices": [
@@ -19,7 +28,12 @@
       "changeDir": "down",
       "asOf": "Fr., 20.11.",
       "note": "Kurze Einordnung",
-      "sources": [{ "name": "Quelle", "url": "https://..." }]
+      "sources": [
+        {
+          "name": "Quelle",
+          "url": "https://..."
+        }
+      ]
     }
   ],
   "news": [
@@ -28,11 +42,23 @@
       "tag": "USA | Deutschland | KI | Zinsen | Börsengang | ...",
       "title": "Überschrift",
       "text": "Zwei bis vier Sätze in eigenen Worten.",
-      "sources": [{ "name": "Quelle", "url": "https://..." }]
+      "sources": [
+        {
+          "name": "Quelle",
+          "url": "https://..."
+        }
+      ]
     }
   ],
   "calendar": [
-    { "date": "26.11.", "event": "Termin", "source": { "name": "Quelle (optional)", "url": "https://..." } }
+    {
+      "date": "26.11.",
+      "event": "Termin",
+      "source": {
+        "name": "Quelle (optional)",
+        "url": "https://..."
+      }
+    }
   ],
   "picks": [
     {
@@ -45,22 +71,52 @@
       "confidence": "hoch | mittel | niedrig",
       "headline": "Eine Zeile mit dem Kern",
       "priceInfo": "Kursinfo mit Datum",
+      "price": 254.65,
+      "currency": "EUR | USD (EUR bei deutschen Werten, USD bei US-Werten)",
+      "priceAsOf": "JJJJ-MM-TT (Schlusskurs vom letzten Handelstag an der Heimatbörse als Zahl; bei Long und Short Pflicht, Grundlage der Bilanz)",
       "whatHappened": "Was passiert ist, drei bis fünf Sätze.",
       "conflictNote": "Optional: Hinweis bei Beteiligung an Anthropic",
-      "scores": { "ereignisse": 0, "analysten": 0, "trend": 0, "positionierung": 0, "qualitaet": 0, "bewertung": 0 },
-      "longReasons": ["Grund für Long"],
-      "shortReasons": ["Grund für Short"],
+      "scores": {
+        "ereignisse": 0,
+        "analysten": 0,
+        "trend": 0,
+        "positionierung": 0,
+        "qualitaet": 0,
+        "bewertung": 0
+      },
+      "longReasons": [
+        "Grund für Long"
+      ],
+      "shortReasons": [
+        "Grund für Short"
+      ],
       "pricedIn": "Ist die Nachricht schon im Kurs?",
-      "catalysts": [{ "date": "11.02.2027", "event": "Nächster Termin" }],
+      "catalysts": [
+        {
+          "date": "11.02.2027",
+          "event": "Nächster Termin"
+        }
+      ],
       "invalidation": "Was die Einschätzung kippen würde.",
       "implementation": "Umsetzung für einen Privatanleger ohne Hebel.",
-      "sources": [{ "name": "Quelle", "title": "Titel des Artikels", "url": "https://..." }]
+      "sources": [
+        {
+          "name": "Quelle",
+          "title": "Titel des Artikels",
+          "url": "https://..."
+        }
+      ]
     }
   ],
   "portfolio": {
     "asOf": "TT.MM.JJJJ",
     "summary": "Zwei bis drei Sätze zur Lage des Depots insgesamt.",
-    "notes": [{ "title": "Kurzer Titel", "text": "Depotweite Beobachtung, z. B. Überschneidungen, gemeinsame Treiber, Währung, wichtigster Termin." }],
+    "notes": [
+      {
+        "title": "Kurzer Titel",
+        "text": "Depotweite Beobachtung, z. B. Überschneidungen, gemeinsame Treiber, Währung, wichtigster Termin."
+      }
+    ],
     "positions": [
       {
         "id": "kurzname (fest, nie ändern)",
@@ -73,25 +129,54 @@
         "tvSymbol": "XETR:XXXX (Chart-Symbol; bei Zertifikaten ohne Chart ein vergleichbarer ETF)",
         "chartNote": "Optional: Hinweis, wenn der Chart nur ein Vergleich ist",
         "underlying": "Basiswert",
+        "underlyingQuote": {
+          "level": 2667.7,
+          "currency": "USD",
+          "changePct": 0.1,
+          "asOf": "Börse und Datum, z. B. Börse Stuttgart 26.11.2026",
+          "source": {
+            "name": "MarketScreener",
+            "url": "https://..."
+          },
+          "_hinweis": "Optional, nur beim Wasser-Zertifikat: Stand des Basiswerts"
+        },
         "buyPrice": 100.0,
         "price": 95.5,
         "priceAsOf": "Börse und Datum des Kurses",
-        "priceSource": { "name": "Quelle", "url": "https://..." },
+        "priceSource": {
+          "name": "Quelle",
+          "url": "https://..."
+        },
         "priceNote": "Nur wenn price null ist: warum kein Kurs",
         "stance": "rueckenwind | neutral | gegenwind",
         "headline": "Eine Zeile zur Lage",
         "situation": "Was seit dem letzten Bericht passiert ist, drei bis fünf Sätze.",
-        "tailwinds": ["Was für die Anlage spricht"],
-        "headwinds": ["Was gegen die Anlage spricht"],
+        "tailwinds": [
+          "Was für die Anlage spricht"
+        ],
+        "headwinds": [
+          "Was gegen die Anlage spricht"
+        ],
         "meaning": "Was das für Michel heißt: sachlich, mit Bezug zum Raster, ohne Kauf- oder Verkaufsbefehl.",
-        "watch": ["Worauf er achten sollte"],
+        "watch": [
+          "Worauf er achten sollte"
+        ],
         "product": "Produktart, Kosten, besondere Risiken",
-        "sources": [{ "name": "Quelle", "title": "Titel", "url": "https://..." }]
+        "sources": [
+          {
+            "name": "Quelle",
+            "title": "Titel",
+            "url": "https://..."
+          }
+        ]
       }
     ]
   },
   "excluded": [
-    { "name": "Anthropic (ANT)", "reason": "Claude wird von Anthropic entwickelt. Um Interessenkonflikte zu vermeiden, gibt diese Seite zu Anthropic keine Einschätzung ab." }
+    {
+      "name": "Anthropic (ANT)",
+      "reason": "Claude wird von Anthropic entwickelt. Um Interessenkonflikte zu vermeiden, gibt diese Seite zu Anthropic keine Einschätzung ab."
+    }
   ],
   "paperUrl": "https://claude.ai/artifact/C2eJshCkJpVWD9bk9Cw3o4",
   "methodNote": "Jede Aktie bekommt in sechs Kategorien minus 2 bis plus 2 Punkte; Ereignisse zählen doppelt. Long ab plus 4, Short-Kandidat ab minus 4. Bei roter Marktampel gilt für Long plus 5, bei grüner für Short minus 5. Zuversicht hoch bei mindestens vier gleichgerichteten Kategorien, mittel bei drei.",

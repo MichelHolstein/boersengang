@@ -1,0 +1,202 @@
+{
+  "asOf": "2026-06-22",
+  "nextReview": "2026-12-03",
+  "note": "DAX-Zusammensetzung für die Live-Ansicht der Website (Kurse über GETTEX bei TradingView). Wird von der täglichen Automatik nach Indexänderungen angepasst.",
+  "groups": [
+    {
+      "sector": "Industrie",
+      "members": [
+        {
+          "ticker": "SIE",
+          "name": "Siemens"
+        },
+        {
+          "ticker": "ENR",
+          "name": "Siemens Energy"
+        },
+        {
+          "ticker": "AIR",
+          "name": "Airbus"
+        },
+        {
+          "ticker": "RHM",
+          "name": "Rheinmetall"
+        },
+        {
+          "ticker": "MTX",
+          "name": "MTU Aero Engines"
+        },
+        {
+          "ticker": "DHL",
+          "name": "DHL Group"
+        },
+        {
+          "ticker": "G1A",
+          "name": "GEA"
+        },
+        {
+          "ticker": "HOT",
+          "name": "Hochtief"
+        }
+      ]
+    },
+    {
+      "sector": "Finanzen",
+      "members": [
+        {
+          "ticker": "ALV",
+          "name": "Allianz"
+        },
+        {
+          "ticker": "MUV2",
+          "name": "Münchener Rück"
+        },
+        {
+          "ticker": "HNR1",
+          "name": "Hannover Rück"
+        },
+        {
+          "ticker": "DBK",
+          "name": "Deutsche Bank"
+        },
+        {
+          "ticker": "CBK",
+          "name": "Commerzbank"
+        },
+        {
+          "ticker": "DB1",
+          "name": "Deutsche Börse"
+        }
+      ]
+    },
+    {
+      "sector": "Technologie",
+      "members": [
+        {
+          "ticker": "SAP",
+          "name": "SAP"
+        },
+        {
+          "ticker": "IFX",
+          "name": "Infineon"
+        },
+        {
+          "ticker": "G24",
+          "name": "Scout24"
+        }
+      ]
+    },
+    {
+      "sector": "Auto und Konsum",
+      "members": [
+        {
+          "ticker": "MBG",
+          "name": "Mercedes-Benz"
+        },
+        {
+          "ticker": "BMW",
+          "name": "BMW"
+        },
+        {
+          "ticker": "VOW3",
+          "name": "Volkswagen Vz."
+        },
+        {
+          "ticker": "DTG",
+          "name": "Daimler Truck"
+        },
+        {
+          "ticker": "CON",
+          "name": "Continental"
+        },
+        {
+          "ticker": "ADS",
+          "name": "adidas"
+        },
+        {
+          "ticker": "ZAL",
+          "name": "Zalando"
+        },
+        {
+          "ticker": "BEI",
+          "name": "Beiersdorf"
+        },
+        {
+          "ticker": "HEN3",
+          "name": "Henkel Vz."
+        }
+      ]
+    },
+    {
+      "sector": "Gesundheit",
+      "members": [
+        {
+          "ticker": "MRK",
+          "name": "Merck"
+        },
+        {
+          "ticker": "BAYN",
+          "name": "Bayer"
+        },
+        {
+          "ticker": "SHL",
+          "name": "Siemens Healthineers"
+        },
+        {
+          "ticker": "FRE",
+          "name": "Fresenius"
+        },
+        {
+          "ticker": "FME",
+          "name": "Fresenius Medical Care"
+        },
+        {
+          "ticker": "QIA",
+          "name": "Qiagen"
+        }
+      ]
+    },
+    {
+      "sector": "Chemie und Baustoffe",
+      "members": [
+        {
+          "ticker": "BAS",
+          "name": "BASF"
+        },
+        {
+          "ticker": "SY1",
+          "name": "Symrise"
+        },
+        {
+          "ticker": "BNR",
+          "name": "Brenntag"
+        },
+        {
+          "ticker": "HEI",
+          "name": "Heidelberg Materials"
+        }
+      ]
+    },
+    {
+      "sector": "Versorger, Telekom, Immobilien",
+      "members": [
+        {
+          "ticker": "RWE",
+          "name": "RWE"
+        },
+        {
+          "ticker": "EOAN",
+          "name": "E.ON"
+        },
+        {
+          "ticker": "DTE",
+          "name": "Deutsche Telekom"
+        },
+        {
+          "ticker": "VNA",
+          "name": "Vonovia"
+        }
+      ]
+    }
+  ]
+}
